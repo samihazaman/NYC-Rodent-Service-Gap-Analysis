@@ -4,6 +4,11 @@
 
 Samiha Zaman, Arooj Manzar
 
+## The Question
+When a New Yorker sees a rat, they call 311. When the Health Department inspects a restaurant, every violation gets a code. Both records are public. Nobody has told you whether they agree.
+
+**Deliverable:** a Service Gap Index for every ZIP code in New York City, and a dashboard where anyone can type in their own ZIP and find out how their block is served.
+
 ## Project Overview
 
 This project analyzes the gap between what NYC residents report about rodent activity (311 complaints) and what NYC Department of Health inspectors actually verify during restaurant inspections. By joining these two datasets at the ZIP-code level, we identify neighborhoods where inspector-verified rodent evidence diverges from resident-reported complaints — helping surface potential underreporting or service delivery gaps.
