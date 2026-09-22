@@ -72,3 +72,7 @@ A natural-language Q&A agent grounded in the cleaned Unity Catalog tables, enabl
 - **Data Storage:** Unity Catalog managed tables
 
 ---
+
+
+<img width="948" height="786" alt="Service Gap Dashboard" src="https://github.com/user-attachments/assets/4ed5b778-8ae5-4c17-a895-7ae7554c5417" />
+
