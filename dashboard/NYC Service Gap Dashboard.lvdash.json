@@ -1,0 +1,936 @@
+{
+  "datasets": [
+    {
+      "name": "cc18ba8b",
+      "displayName": "zip_service_gap",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.default.zip_service_gap",
+        "dimensions": [
+          {
+            "name": "zip_code",
+            "expr": "zip_code",
+            "comment": "Five-digit NYC ZIP. Primary key, one row per ZIP."
+          },
+          {
+            "name": "borough",
+            "expr": "borough",
+            "comment": "Modal borough for this ZIP, from its 311 complaints."
+          },
+          {
+            "name": "complaints_total",
+            "expr": "complaints_total",
+            "comment": "All 311 rodent complaints in this ZIP (evidence + condition)."
+          },
+          {
+            "name": "complaints_evidence",
+            "expr": "complaints_evidence",
+            "comment": "Complaints where a rodent or its signs were reported seen."
+          },
+          {
+            "name": "complaints_condition",
+            "expr": "complaints_condition",
+            "comment": "Complaints about conditions attracting rodents; no rodent reported seen."
+          },
+          {
+            "name": "complaints_commercial",
+            "expr": "complaints_commercial",
+            "comment": "311 rodent complaints at commercial buildings. Shares a population with restaurant inspection data."
+          },
+          {
+            "name": "complaints_residential",
+            "expr": "complaints_residential",
+            "comment": "311 rodent complaints at non-commercial locations. No restaurant denominator."
+          },
+          {
+            "name": "restaurants_inspected",
+            "expr": "restaurants_inspected",
+            "comment": "Distinct restaurants inspected in this ZIP."
+          },
+          {
+            "name": "restaurants_rodent_evidence",
+            "expr": "restaurants_rodent_evidence",
+            "comment": "Distinct restaurants cited 04K or 04L, inspector-verified rodent evidence."
+          },
+          {
+            "name": "restaurants_harborage",
+            "expr": "restaurants_harborage",
+            "comment": "Distinct restaurants cited 08A, conditions conducive to rodents."
+          },
+          {
+            "name": "verified_rodent_rate",
+            "expr": "verified_rodent_rate",
+            "comment": "restaurants_rodent_evidence / restaurants_inspected. Best proxy for real rodent conditions."
+          },
+          {
+            "name": "commercial_complaints_per_100_restaurants",
+            "expr": "commercial_complaints_per_100_restaurants",
+            "comment": "Commercial 311 complaints per 100 inspected restaurants. Valid ratio: same population on both sides."
+          },
+          {
+            "name": "pct_closed",
+            "expr": "pct_closed",
+            "comment": "Share of this ZIP's complaints with a closed_ts."
+          },
+          {
+            "name": "median_hours_to_close",
+            "expr": "median_hours_to_close",
+            "comment": "Median hours from filing to closure among closed complaints."
+          },
+          {
+            "name": "pct_closed_under_1hr",
+            "expr": "pct_closed_under_1hr",
+            "comment": "Share of complaints closed within one hour of filing."
+          },
+          {
+            "name": "z_verified",
+            "expr": "z_verified",
+            "comment": "verified_rodent_rate as a z-score across ZIPs with sufficient data."
+          },
+          {
+            "name": "z_reporting_commercial",
+            "expr": "z_reporting_commercial",
+            "comment": "commercial_complaints_per_100_restaurants as a z-score across ZIPs with sufficient data."
+          },
+          {
+            "name": "restaurant_service_gap_index",
+            "expr": "restaurant_service_gap_index",
+            "comment": "z_verified minus z_reporting_commercial. High means inspectors verify rodent conditions but commercial reporting is low."
+          },
+          {
+            "name": "residential_complaint_rank_citywide",
+            "expr": "residential_complaint_rank_citywide",
+            "comment": "Citywide rank of residential complaint volume. Rank 1 is most residential complaints."
+          },
+          {
+            "name": "data_sufficiency",
+            "expr": "data_sufficiency",
+            "comment": "sufficient, thin, or insufficient. Index withheld for insufficient ZIPs."
+          },
+          {
+            "name": "zip_note",
+            "expr": "zip_note",
+            "comment": "Plain-language caveat for this ZIP, meant for display."
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "displayName": "Count",
+            "comment": "Total number of ZIP codes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "zip_metrics_long",
+      "displayName": "ZIP Metrics (Long Format)",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT zip_code, '311 Complaints' AS category, 'Rodent Evidence' AS metric_name, CAST(complaints_evidence AS DOUBLE) AS value FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, '311 Complaints', 'Condition Reports', CAST(complaints_condition AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, '311 Complaints', 'Commercial', CAST(complaints_commercial AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, '311 Complaints', 'Residential', CAST(complaints_residential AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Restaurant Inspections', 'Rodent Evidence', CAST(restaurants_rodent_evidence AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Restaurant Inspections', 'Harborage', CAST(restaurants_harborage AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Z-Scores', 'Verified (z)', CAST(z_verified AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Z-Scores', 'Reporting Commercial (z)', CAST(z_reporting_commercial AS DOUBLE) FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Key Rates', 'Verified Rodent Rate (%)', CAST(verified_rodent_rate AS DOUBLE) * 100 FROM workspace.default.zip_service_gap UNION ALL SELECT zip_code, 'Key Rates', 'Commercial Complaints per 100 Restaurants', CAST(commercial_complaints_per_100_restaurants AS DOUBLE) FROM workspace.default.zip_service_gap\n",
+        "dimensions": [
+          {
+            "name": "zip_code",
+            "expr": "zip_code",
+            "comment": "Five-digit NYC ZIP code"
+          },
+          {
+            "name": "category",
+            "expr": "category",
+            "comment": "Metric category for grouping"
+          },
+          {
+            "name": "metric_name",
+            "expr": "metric_name",
+            "comment": "Specific metric name within the category"
+          }
+        ],
+        "measures": [
+          {
+            "name": "total_value",
+            "expr": "SUM(value)",
+            "displayName": "Value",
+            "comment": "Metric value summed across any grouping"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "281cce22",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "b0bfe332",
+            "queries": [
+              {
+                "name": "dashboards/01f1b495305b1cd6ba11c647a1d01742/datasets/01f1b495305b1d3998c63a8d3ab72dbd_zip_code",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "zip_code",
+                      "expression": "`zip_code`"
+                    },
+                    {
+                      "name": "zip_code_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Select ZIP Code"
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "zip_code",
+                    "queryName": "dashboards/01f1b495305b1cd6ba11c647a1d01742/datasets/01f1b495305b1d3998c63a8d3ab72dbd_zip_code"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "79ae5a2c",
+      "displayName": "NYC Service Gap Dashboard",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## NYC Rodent Service Gap — ZIP Code Story\n",
+                "\n",
+                "Each NYC ZIP code blends **311 rodent complaints** (what residents report) with **DOHMH restaurant inspections** (what inspectors verify). The **Restaurant Service Gap Index** compares inspector-verified rodent evidence to commercial-only 311 reporting density — a high index means inspectors find rodent problems that businesses aren't calling about. **Residential complaint volume is ranked separately** because it has no restaurant denominator. Select a ZIP code from the dropdown above to explore its story, including honest data-sufficiency caveats for low-volume areas like JFK Airport (11430)."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "complaint_breakdown",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "zip_metrics_long",
+                  "fields": [
+                    {
+                      "name": "metric_name",
+                      "expression": "`metric_name`"
+                    },
+                    {
+                      "name": "measure(total_value)",
+                      "expression": "MEASURE(`total_value`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`category` IN ('311 Complaints')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "311 Complaint Breakdown"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "inspection_findings",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "zip_metrics_long",
+                  "fields": [
+                    {
+                      "name": "metric_name",
+                      "expression": "`metric_name`"
+                    },
+                    {
+                      "name": "measure(total_value)",
+                      "expression": "MEASURE(`total_value`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`category` IN ('Restaurant Inspections')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Inspection Findings"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "zscore_comparison",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "zip_metrics_long",
+                  "fields": [
+                    {
+                      "name": "metric_name",
+                      "expression": "`metric_name`"
+                    },
+                    {
+                      "name": "measure(total_value)",
+                      "expression": "MEASURE(`total_value`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`category` IN ('Z-Scores')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Z-Score Comparison"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "key_rates",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "zip_metrics_long",
+                  "fields": [
+                    {
+                      "name": "metric_name",
+                      "expression": "`metric_name`"
+                    },
+                    {
+                      "name": "measure(total_value)",
+                      "expression": "MEASURE(`total_value`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`category` IN ('Key Rates')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Key Rates",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 11,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "detail_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "zip_code",
+                      "expression": "`zip_code`"
+                    },
+                    {
+                      "name": "borough",
+                      "expression": "`borough`"
+                    },
+                    {
+                      "name": "complaints_total",
+                      "expression": "`complaints_total`"
+                    },
+                    {
+                      "name": "complaints_evidence",
+                      "expression": "`complaints_evidence`"
+                    },
+                    {
+                      "name": "complaints_condition",
+                      "expression": "`complaints_condition`"
+                    },
+                    {
+                      "name": "complaints_commercial",
+                      "expression": "`complaints_commercial`"
+                    },
+                    {
+                      "name": "complaints_residential",
+                      "expression": "`complaints_residential`"
+                    },
+                    {
+                      "name": "restaurants_inspected",
+                      "expression": "`restaurants_inspected`"
+                    },
+                    {
+                      "name": "restaurants_rodent_evidence",
+                      "expression": "`restaurants_rodent_evidence`"
+                    },
+                    {
+                      "name": "restaurants_harborage",
+                      "expression": "`restaurants_harborage`"
+                    },
+                    {
+                      "name": "verified_rodent_rate",
+                      "expression": "`verified_rodent_rate`"
+                    },
+                    {
+                      "name": "commercial_complaints_per_100_restaurants",
+                      "expression": "`commercial_complaints_per_100_restaurants`"
+                    },
+                    {
+                      "name": "restaurant_service_gap_index",
+                      "expression": "`restaurant_service_gap_index`"
+                    },
+                    {
+                      "name": "residential_complaint_rank_citywide",
+                      "expression": "`residential_complaint_rank_citywide`"
+                    },
+                    {
+                      "name": "data_sufficiency",
+                      "expression": "`data_sufficiency`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "ZIP Code Details",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "zip_code"
+                  },
+                  {
+                    "fieldName": "borough"
+                  },
+                  {
+                    "fieldName": "complaints_total"
+                  },
+                  {
+                    "fieldName": "complaints_evidence"
+                  },
+                  {
+                    "fieldName": "complaints_condition"
+                  },
+                  {
+                    "fieldName": "complaints_commercial"
+                  },
+                  {
+                    "fieldName": "complaints_residential"
+                  },
+                  {
+                    "fieldName": "restaurants_inspected"
+                  },
+                  {
+                    "fieldName": "restaurants_rodent_evidence"
+                  },
+                  {
+                    "fieldName": "restaurants_harborage"
+                  },
+                  {
+                    "fieldName": "verified_rodent_rate"
+                  },
+                  {
+                    "fieldName": "commercial_complaints_per_100_restaurants"
+                  },
+                  {
+                    "fieldName": "restaurant_service_gap_index"
+                  },
+                  {
+                    "fieldName": "residential_complaint_rank_citywide"
+                  },
+                  {
+                    "fieldName": "data_sufficiency"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 8,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "zip_note",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "data_sufficiency",
+                      "expression": "`data_sufficiency`"
+                    },
+                    {
+                      "name": "zip_note",
+                      "expression": "`zip_note`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "ZIP Note & Data Sufficiency"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "data_sufficiency"
+                  },
+                  {
+                    "fieldName": "zip_note"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 17,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "sgi_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "borough",
+                      "expression": "`borough`"
+                    },
+                    {
+                      "name": "avg(restaurant_service_gap_index)",
+                      "expression": "AVG(`restaurant_service_gap_index`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "`borough`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Service Gap Index"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(restaurant_service_gap_index)"
+                },
+                "period": {
+                  "fieldName": "borough",
+                  "hideLabels": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "complaints_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "borough",
+                      "expression": "`borough`"
+                    },
+                    {
+                      "name": "sum(complaints_total)",
+                      "expression": "SUM(`complaints_total`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "`borough`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "311 Complaints"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(complaints_total)"
+                },
+                "period": {
+                  "fieldName": "borough",
+                  "hideLabels": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "restaurants_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "borough",
+                      "expression": "`borough`"
+                    },
+                    {
+                      "name": "sum(restaurants_inspected)",
+                      "expression": "SUM(`restaurants_inspected`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "`borough`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Restaurants Inspected"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(restaurants_inspected)"
+                },
+                "period": {
+                  "fieldName": "borough",
+                  "hideLabels": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "vrr_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cc18ba8b",
+                  "fields": [
+                    {
+                      "name": "borough",
+                      "expression": "`borough`"
+                    },
+                    {
+                      "name": "avg(verified_rodent_rate)",
+                      "expression": "AVG(`verified_rodent_rate`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "`borough`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Verified Rodent Rate"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(verified_rodent_rate)"
+                },
+                "period": {
+                  "fieldName": "borough",
+                  "hideLabels": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
